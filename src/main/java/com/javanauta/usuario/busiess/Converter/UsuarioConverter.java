@@ -84,6 +84,7 @@ public class UsuarioConverter {
 
     public EnderecoDTO paraEndereco(Endereco endereco) {
         return EnderecoDTO.builder()
+                .id(endereco.getId())
                 .rua(endereco.getRua())
                 .numero(endereco.getNumero())
                 .complemento(endereco.getComplemento())
@@ -105,7 +106,9 @@ public class UsuarioConverter {
 
     public TelefoneDTO paraTelefone(Telefone telefone) {
         return TelefoneDTO.builder()
-                .numero(telefone.getNumero() == null
+                .id(telefone.getId())
+                .numero(telefone.getNumero()
+                        == null
                         ? null
                         : telefone.getNumero().toString())
                 .ddd(telefone.getDdd())
@@ -113,12 +116,60 @@ public class UsuarioConverter {
     }
     public Usuario updateUsuario(UsuarioDTO usuarioDTO, Usuario entity) {
         return Usuario.builder()
-                .nome(usuarioDTO.getNome() != null ? usuarioDTO.getNome() : entity.getNome())
+                .nome(usuarioDTO.getNome() != null
+                        ? usuarioDTO.getNome()
+                        : entity.getNome())
                 .id(entity.getId())
-                .senha(usuarioDTO.getSenha() != null ? usuarioDTO.getSenha() : entity.getSenha())
-                .email(usuarioDTO.getEmail() != null ? usuarioDTO.getEmail() : entity.getEmail())
+                .senha(usuarioDTO.getSenha() != null
+                        ? usuarioDTO.getSenha()
+                        : entity.getSenha())
+                .email(usuarioDTO.getEmail() != null
+                        ? usuarioDTO.getEmail()
+                        : entity.getEmail())
                 .enderecos(entity.getEnderecos())
                 .telefones(entity.getTelefones())
+                .build();
+    }
+    public Endereco updateEndereco(
+            EnderecoDTO dto,
+            Endereco entity
+    ) {
+        return Endereco.builder()
+                .id(entity.getId())
+                .rua(dto.getRua() != null
+                        ? dto.getRua()
+                        : entity.getRua())
+                .bairro(entity.getBairro())
+                .numero(dto.getNumero() != null
+                        ? dto.getNumero()
+                        : entity.getNumero())
+                .complemento(dto.getComplemento() != null
+                        ? dto.getComplemento()
+                        : entity.getComplemento())
+                .cidade(dto.getCidade() != null
+                        ? dto.getCidade()
+                        : entity.getCidade())
+                .estado(dto.getEstado() != null
+                        ? dto.getEstado()
+                        : entity.getEstado())
+                .cep(dto.getCep() != null
+                        ? dto.getCep()
+                        : entity.getCep())
+                .build();
+    }
+
+    public Telefone updateTelefone(
+            TelefoneDTO dto,
+            Telefone entity
+    ) {
+        return Telefone.builder()
+                .id(entity.getId())
+                .numero(dto.getNumero() != null
+                        ? Long.valueOf(dto.getNumero())
+                        : entity.getNumero())
+                .ddd(dto.getDdd() != null
+                        ? dto.getDdd()
+                        : entity.getDdd())
                 .build();
     }
 }

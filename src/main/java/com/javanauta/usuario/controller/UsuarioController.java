@@ -1,6 +1,8 @@
 package com.javanauta.usuario.controller;
 
 import com.javanauta.usuario.busiess.UsuarioService;
+import com.javanauta.usuario.busiess.dto.EnderecoDTO;
+import com.javanauta.usuario.busiess.dto.TelefoneDTO;
 import com.javanauta.usuario.busiess.dto.UsuarioDTO;
 import com.javanauta.usuario.infrastructure.security.JwtUtil;
 import lombok.RequiredArgsConstructor;
@@ -39,21 +41,38 @@ public class UsuarioController {
         );
         return "Bearer " + jwtUtil.generateToken(authentication.getName());
     }
+
     @GetMapping
     public ResponseEntity<UsuarioDTO> buscaUsuarioPorEmail(@RequestParam("email") String email) {
         return ResponseEntity.ok(usuarioService.buscaUsuarioPorEmail(email));
 
     }
+
     @DeleteMapping("/{email}")
     public ResponseEntity<Void> deletaUsuarioPorEmail(@PathVariable String email) {
         usuarioService.deletaUsuarioPorEmail(email);
         return ResponseEntity.ok().build();
 
     }
+
     @PutMapping
     public ResponseEntity<UsuarioDTO> atualizaDadosUsuario(@RequestBody UsuarioDTO dto,
                                                            @RequestHeader("Authorization") String token) {
         return ResponseEntity.ok(usuarioService.atualizaDadosUsuario(token, dto));
 
+    }
+
+    @PutMapping("/endereco")
+    public ResponseEntity<EnderecoDTO> atualizaEndereco(@RequestBody EnderecoDTO dto) {
+        return ResponseEntity.ok(
+                usuarioService.atualizaEndereco(dto)
+        );
+    }
+
+    @PutMapping("/telefone")
+    public ResponseEntity<TelefoneDTO> atualizaTelefone(@RequestBody TelefoneDTO dto) {
+        return ResponseEntity.ok(
+                usuarioService.atualizaTelefone(dto)
+        );
     }
 }
