@@ -4,11 +4,11 @@ import com.javanauta.usuario.busiess.UsuarioService;
 import com.javanauta.usuario.busiess.dto.EnderecoDTO;
 import com.javanauta.usuario.busiess.dto.TelefoneDTO;
 import com.javanauta.usuario.busiess.dto.UsuarioDTO;
-import com.javanauta.usuario.infrastructure.entity.Usuario;
-import com.javanauta.usuario.infrastructure.exceptions.ResourceNotFoundException;
 import com.javanauta.usuario.infrastructure.security.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -43,11 +43,13 @@ public class UsuarioController {
         );
         return "Bearer " + jwtUtil.generateToken(authentication.getName());
     }
+
     @GetMapping
     public ResponseEntity<UsuarioDTO> buscaUsuarioPorEmail(@RequestParam("email") String email) {
         return ResponseEntity.ok(usuarioService.buscaUsuarioPorEmail(email));
 
     }
+
     @DeleteMapping("/{email}")
     public ResponseEntity<Void> deletaUsuarioPorEmail(@PathVariable String email) {
         usuarioService.deletaUsuarioPorEmail(email);
@@ -64,16 +66,16 @@ public class UsuarioController {
 
     @PutMapping("/endereco")
     public ResponseEntity<EnderecoDTO> atualizaEndereco(
-            @RequestParam("id") Long idEndereco,
+            @RequestParam(value = "id", required = false) Long idEndereco,
             @RequestBody EnderecoDTO dto) {
-        return ResponseEntity.ok(usuarioService.atualizaEndereco(idEndereco, dto));
+        return ResponseEntity.ok(usuarioService.atualizaEndereco(resolveId(idEndereco, dto.getId()), dto));
     }
 
     @PutMapping("/telefone")
     public ResponseEntity<TelefoneDTO> atualizaTelefone(
-            @RequestParam("id") Long id,
+            @RequestParam(value = "id", required = false) Long id,
             @RequestBody TelefoneDTO dto) {
-        return ResponseEntity.ok(usuarioService.atualizaTelefone(id, dto));
+        return ResponseEntity.ok(usuarioService.atualizaTelefone(resolveId(id, dto.getId()), dto));
     }
     @PostMapping("/endereco")
     public ResponseEntity<EnderecoDTO> cadastraEndereco(
@@ -89,5 +91,15 @@ public class UsuarioController {
 
 
 
+    }
+    private Long resolveId(Long parametroId, Long corpoId) {
+        if (parametroId != null && corpoId != null && !parametroId.equals(corpoId)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "IDs diferentes na URL e no corpo");
+        }
+        Long id = parametroId != null ? parametroId : corpoId;
+        if (id == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Informe o ID na URL ou no corpo");
+        }
+        return id;
     }
 }

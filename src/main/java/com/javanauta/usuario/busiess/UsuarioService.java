@@ -17,9 +17,7 @@ import com.javanauta.usuario.infrastructure.security.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 
 @Service
 @RequiredArgsConstructor
@@ -57,9 +55,11 @@ import java.util.ArrayList;
 
     public UsuarioDTO buscaUsuarioPorEmail(String email) {
         Usuario usuario = usuarioRepository.findByEmail(email)
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "Email não encontrado: " + email
-                ));
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Email não encontrado: " + email
+                        )
+                );
 
         return usuarioConverter.paraUsuarioDTO(usuario);
     }
@@ -75,7 +75,7 @@ import java.util.ArrayList;
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Email não localizado: " + email));
 
-        dto.setSenha(dto.getSenha() != null
+        dto.setSenha(dto.getSenha() != null && !dto.getSenha().isBlank()
                 ? passwordEncoder.encode(dto.getSenha())
                 : null);
 
@@ -114,7 +114,7 @@ import java.util.ArrayList;
     }
 
     public TelefoneDTO cadastraTelefone(String token, TelefoneDTO dto) {
-        String email = jwtUtil.extrairEmailToken(token.substring(7));
+        String email = jwtUtil.extrairEmailToken(token);
         Usuario usuario = usuarioRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("Email não localizado: " + email));
 
