@@ -7,6 +7,8 @@ import com.javanauta.usuario.busiess.dto.UsuarioDTO;
 import com.javanauta.usuario.infrastructure.security.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -56,23 +58,48 @@ public class UsuarioController {
     }
 
     @PutMapping
-    public ResponseEntity<UsuarioDTO> atualizaDadosUsuario(@RequestBody UsuarioDTO dto,
-                                                           @RequestHeader("Authorization") String token) {
+    public ResponseEntity<UsuarioDTO> atualizaDadosUsuario(
+            @RequestBody UsuarioDTO dto,
+            @RequestHeader("Authorization") String token) {
         return ResponseEntity.ok(usuarioService.atualizaDadosUsuario(token, dto));
-
     }
 
     @PutMapping("/endereco")
-    public ResponseEntity<EnderecoDTO> atualizaEndereco(@RequestBody EnderecoDTO dto) {
-        return ResponseEntity.ok(
-                usuarioService.atualizaEndereco(dto)
-        );
+    public ResponseEntity<EnderecoDTO> atualizaEndereco(
+            @RequestParam(value = "id", required = false) Long idEndereco,
+            @RequestBody EnderecoDTO dto) {
+        return ResponseEntity.ok(usuarioService.atualizaEndereco(resolveId(idEndereco, dto.getId()), dto));
     }
 
     @PutMapping("/telefone")
-    public ResponseEntity<TelefoneDTO> atualizaTelefone(@RequestBody TelefoneDTO dto) {
-        return ResponseEntity.ok(
-                usuarioService.atualizaTelefone(dto)
-        );
+    public ResponseEntity<TelefoneDTO> atualizaTelefone(
+            @RequestParam(value = "id", required = false) Long id,
+            @RequestBody TelefoneDTO dto) {
+        return ResponseEntity.ok(usuarioService.atualizaTelefone(resolveId(id, dto.getId()), dto));
+    }
+    @PostMapping("/endereco")
+    public ResponseEntity<EnderecoDTO> cadastraEndereco(
+            @RequestBody EnderecoDTO dto,
+            @RequestHeader("Authorization")  String token) {
+        return ResponseEntity.ok(usuarioService.cadastraEndereco(token, dto));
+    }
+        @PostMapping("/telefone")
+        public ResponseEntity<TelefoneDTO> cadastraTelefone(
+                @RequestBody TelefoneDTO dto,
+                @RequestHeader("Authorization")  String token) {
+            return ResponseEntity.ok(usuarioService.cadastraTelefone(token, dto));
+
+
+
+    }
+    private Long resolveId(Long parametroId, Long corpoId) {
+        if (parametroId != null && corpoId != null && !parametroId.equals(corpoId)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "IDs diferentes na URL e no corpo");
+        }
+        Long id = parametroId != null ? parametroId : corpoId;
+        if (id == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Informe o ID na URL ou no corpo");
+        }
+        return id;
     }
 }
