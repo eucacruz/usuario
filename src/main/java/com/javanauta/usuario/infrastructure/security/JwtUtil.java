@@ -42,6 +42,18 @@ public class JwtUtil {
         return extractClaims(token).getSubject();
     }
 
+    // Extrai o e-mail do cabeçalho Authorization ou de um JWT sem prefixo.
+    public String extrairEmailToken(String token) {
+        if (token == null || token.isBlank()) {
+            throw new IllegalArgumentException("Token não informado");
+        }
+        String jwt = token.trim();
+        if (jwt.regionMatches(true, 0, "Bearer ", 0, 7)) {
+            jwt = jwt.substring(7).trim();
+        }
+        return extractUsername(jwt);
+    }
+
     // Verifica se o token JWT está expirado
     public boolean isTokenExpired(String token) {
         // Compara a data de expiração do token com a data atual
@@ -55,4 +67,6 @@ public class JwtUtil {
         // Verifica se o nome de usuário do token corresponde ao fornecido e se o token não está expirado
         return (extractedUsername.equals(username) && !isTokenExpired(token));
     }
+
+
 }

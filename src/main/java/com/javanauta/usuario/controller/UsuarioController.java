@@ -1,27 +1,105 @@
 package com.javanauta.usuario.controller;
 
 import com.javanauta.usuario.busiess.UsuarioService;
+import com.javanauta.usuario.busiess.dto.EnderecoDTO;
+import com.javanauta.usuario.busiess.dto.TelefoneDTO;
 import com.javanauta.usuario.busiess.dto.UsuarioDTO;
-import com.javanauta.usuario.infrastructure.entity.Usuario;
+import com.javanauta.usuario.infrastructure.security.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping
+@RequestMapping("/usuario")
 @RequiredArgsConstructor
-
 public class UsuarioController {
+
     private final UsuarioService usuarioService;
+    private final AuthenticationManager authenticationManager;
+    private final JwtUtil jwtUtil;
 
     @PostMapping
-    public ResponseEntity<UsuarioDTO> salvaUsuario(@RequestBody UsuarioDTO usuarioDTO) {
+    public ResponseEntity<UsuarioDTO> salvaUsuario(
+            @RequestBody UsuarioDTO usuarioDTO
+    ) {
         return ResponseEntity.ok(
                 usuarioService.salvarUsuario(usuarioDTO)
         );
+    }
 
+
+    @PostMapping("/login")
+    public String login(@RequestBody UsuarioDTO usuarioDTO) {
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        usuarioDTO.getEmail(),
+                        usuarioDTO.getSenha()
+                )
+        );
+        return "Bearer " + jwtUtil.generateToken(authentication.getName());
+    }
+
+    @GetMapping
+    public ResponseEntity<UsuarioDTO> buscaUsuarioPorEmail(@RequestParam("email") String email) {
+        return ResponseEntity.ok(usuarioService.buscaUsuarioPorEmail(email));
+
+    }
+
+    @DeleteMapping("/{email}")
+    public ResponseEntity<Void> deletaUsuarioPorEmail(@PathVariable String email) {
+        usuarioService.deletaUsuarioPorEmail(email);
+        return ResponseEntity.ok().build();
+
+    }
+
+    @PutMapping
+    public ResponseEntity<UsuarioDTO> atualizaDadosUsuario(
+            @RequestBody UsuarioDTO dto,
+            @RequestHeader("Authorization") String token) {
+        return ResponseEntity.ok(usuarioService.atualizaDadosUsuario(token, dto));
+    }
+
+    @PutMapping("/endereco")
+    public ResponseEntity<EnderecoDTO> atualizaEndereco(
+            @RequestParam(value = "id", required = false) Long idEndereco,
+            @RequestBody EnderecoDTO dto) {
+        return ResponseEntity.ok(usuarioService.atualizaEndereco(resolveId(idEndereco, dto.getId()), dto));
+    }
+
+    @PutMapping("/telefone")
+    public ResponseEntity<TelefoneDTO> atualizaTelefone(
+            @RequestParam(value = "id", required = false) Long id,
+            @RequestBody TelefoneDTO dto) {
+        return ResponseEntity.ok(usuarioService.atualizaTelefone(resolveId(id, dto.getId()), dto));
+    }
+    @PostMapping("/endereco")
+    public ResponseEntity<EnderecoDTO> cadastraEndereco(
+            @RequestBody EnderecoDTO dto,
+            @RequestHeader("Authorization")  String token) {
+        return ResponseEntity.ok(usuarioService.cadastraEndereco(token, dto));
+    }
+        @PostMapping("/telefone")
+        public ResponseEntity<TelefoneDTO> cadastraTelefone(
+                @RequestBody TelefoneDTO dto,
+                @RequestHeader("Authorization")  String token) {
+            return ResponseEntity.ok(usuarioService.cadastraTelefone(token, dto));
+
+
+
+    }
+    private Long resolveId(Long parametroId, Long corpoId) {
+        if (parametroId != null && corpoId != null && !parametroId.equals(corpoId)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "IDs diferentes na URL e no corpo");
+        }
+        Long id = parametroId != null ? parametroId : corpoId;
+        if (id == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Informe o ID na URL ou no corpo");
+        }
+        return id;
     }
 }
