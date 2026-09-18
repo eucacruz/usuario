@@ -1,0 +1,559 @@
+diff --cc src/main/java/com/javanauta/usuario/busiess/Converter/UsuarioConverter.java
+index 334b2f5,53f9e8e..0000000
+--- a/src/main/java/com/javanauta/usuario/busiess/Converter/UsuarioConverter.java
++++ b/src/main/java/com/javanauta/usuario/busiess/Converter/UsuarioConverter.java
+@@@ -1,169 -1,175 +1,234 @@@
+  package com.javanauta.usuario.busiess.Converter;
+  
+  import com.javanauta.usuario.busiess.dto.EnderecoDTO;
+  import com.javanauta.usuario.busiess.dto.TelefoneDTO;
+  import com.javanauta.usuario.busiess.dto.UsuarioDTO;
+  import com.javanauta.usuario.infrastructure.entity.Endereco;
+  import com.javanauta.usuario.infrastructure.entity.Telefone;
+  import com.javanauta.usuario.infrastructure.entity.Usuario;
+  import org.springframework.stereotype.Component;
+  
+  import java.util.List;
+  
+  @Component
+  public class UsuarioConverter {
+  
+      public Usuario paraUsuario(UsuarioDTO usuarioDTO) {
+          return Usuario.builder()
+                  .nome(usuarioDTO.getNome())
+                  .email(usuarioDTO.getEmail())
+                  .senha(usuarioDTO.getSenha())
+                  .enderecos(paraListaEndereco(usuarioDTO.getEnderecos()))
+                  .telefones(paraListaTelefoneses(usuarioDTO.getTelefones()))
+                  .build();
+      }
+  
+      public List<Endereco> paraListaEndereco(List<EnderecoDTO> enderecoDTOS) {
+          if (enderecoDTOS == null) {
+              return List.of();
+          }
+  
+          return enderecoDTOS.stream()
+                  .map(this::paraEndereco)
+                  .toList();
+      }
+  
+      public Endereco paraEndereco(EnderecoDTO enderecoDTO) {
+          return Endereco.builder()
+                  .rua(enderecoDTO.getRua())
+                  .numero(enderecoDTO.getNumero())
+                  .complemento(enderecoDTO.getComplemento())
+                  .cidade(enderecoDTO.getCidade())
+                  .estado(enderecoDTO.getEstado())
+                  .cep(enderecoDTO.getCep())
+                  .build();
+      }
+  
+      public List<Telefone> paraListaTelefoneses(List<TelefoneDTO> telefoneDTOS) {
+          if (telefoneDTOS == null) {
+              return List.of();
+          }
+  
+          return telefoneDTOS.stream()
+                  .map(this::paraTelefone)
+                  .toList();
+      }
+  
+      public Telefone paraTelefone(TelefoneDTO telefoneDTO) {
+          return Telefone.builder()
+                  .numero(telefoneDTO.getNumero() == null
+                          ? null
+                          : Long.valueOf(telefoneDTO.getNumero()))
+                  .ddd(telefoneDTO.getDdd())
+                  .build();
+      }
+  
+      public UsuarioDTO paraUsuarioDTO(Usuario usuario) {
+          return UsuarioDTO.builder()
+                  .nome(usuario.getNome())
+                  .email(usuario.getEmail())
+                  .enderecos(paraListaEnderecoDTO(usuario.getEnderecos()))
+                  .telefones(paraListaTelefoneseDTO(usuario.getTelefones()))
+                  .build();
+      }
+  
+      public List<EnderecoDTO> paraListaEnderecoDTO(List<Endereco> enderecos) {
+          if (enderecos == null) {
+              return List.of();
+          }
+  
+          return enderecos.stream()
+ -                .map(this::paraEndereco)
+ +                .map(this::paraEnderecoDTO)
+                  .toList();
+      }
+  
+ -    public EnderecoDTO paraEndereco(Endereco endereco) {
+ +    public EnderecoDTO paraEnderecoDTO(Endereco endereco) {
+          return EnderecoDTO.builder()
+                  .id(endereco.getId())
+                  .rua(endereco.getRua())
+                  .numero(endereco.getNumero())
+                  .complemento(endereco.getComplemento())
+                  .cidade(endereco.getCidade())
+                  .estado(endereco.getEstado())
+                  .cep(endereco.getCep())
+                  .build();
+      }
+  
+      public List<TelefoneDTO> paraListaTelefoneseDTO(List<Telefone> telefones) {
+          if (telefones == null) {
+              return List.of();
+          }
+  
+          return telefones.stream()
+ -                .map(this::paraTelefone)
+ +                .map(this::paraTelefoneDTO)
+                  .toList();
+      }
+  
+ -    public TelefoneDTO paraTelefone(Telefone telefone) {
+ +    public TelefoneDTO paraTelefoneDTO(Telefone telefone) {
+          return TelefoneDTO.builder()
+                  .id(telefone.getId())
+++<<<<<<< HEAD
+ +                .numero(telefone.getNumero() == null
+++=======
++                 .numero(telefone.getNumero()
++                         == null
+++>>>>>>> origin/develop
+                          ? null
+                          : telefone.getNumero().toString())
+                  .ddd(telefone.getDdd())
+                  .build();
+      }
+++<<<<<<< HEAD
+ +
+ +    public Usuario updateUsuario(UsuarioDTO usuarioDTO, Usuario entity) {
+ +        return Usuario.builder()
+ +                .nome(usuarioDTO.getNome() != null ? usuarioDTO.getNome() : entity.getNome())
+ +                .id(entity.getId())
+ +                .senha(usuarioDTO.getSenha() != null ? usuarioDTO.getSenha() : entity.getSenha())
+ +                .email(usuarioDTO.getEmail() != null ? usuarioDTO.getEmail() : entity.getEmail())
+++=======
++     public Usuario updateUsuario(UsuarioDTO usuarioDTO, Usuario entity) {
++         return Usuario.builder()
++                 .nome(usuarioDTO.getNome() != null
++                         ? usuarioDTO.getNome()
++                         : entity.getNome())
++                 .id(entity.getId())
++                 .senha(usuarioDTO.getSenha() != null
++                         ? usuarioDTO.getSenha()
++                         : entity.getSenha())
++                 .email(usuarioDTO.getEmail() != null
++                         ? usuarioDTO.getEmail()
++                         : entity.getEmail())
+++>>>>>>> origin/develop
+                  .enderecos(entity.getEnderecos())
+                  .telefones(entity.getTelefones())
+                  .build();
+      }
+++<<<<<<< HEAD
+ +
+ +    public Endereco updateEndereco(EnderecoDTO dto, Endereco entity) {
+ +        return Endereco.builder()
+ +                .id(entity.getId())
+ +                .rua(dto.getRua() != null ? dto.getRua() : entity.getRua())
+ +                .numero(dto.getNumero() != null ? dto.getNumero() : entity.getNumero())
+ +                .cidade(dto.getCidade() != null ? dto.getCidade() : entity.getCidade())
+ +                .cep(dto.getCep() != null ? dto.getCep() : entity.getCep())
+ +                .complemento(dto.getComplemento() != null ? dto.getComplemento() : entity.getComplemento())
+ +                .estado(dto.getEstado() != null ? dto.getEstado() : entity.getEstado())
+ +                .build();
+ +    }
+ +
+ +    public Telefone updateTelefone(TelefoneDTO dto, Telefone entity) {
+ +        return Telefone.builder()
+ +                .id(entity.getId())
+ +                .ddd(dto.getDdd() != null ? dto.getDdd() : entity.getDdd())
+ +                .numero(dto.getNumero() != null ? Long.valueOf(dto.getNumero()) : entity.getNumero())
+ +                .build();
+ +    }
+ +    public Endereco paraEnderecoEntity(EnderecoDTO dto, long idUsuario) {
+ +        return Endereco.builder()
+ +                .rua(dto.getRua())
+ +                .cidade(dto.getCidade())
+ +                .cep(dto.getCep())
+ +                .complemento(dto.getComplemento())
+ +                .estado(dto.getEstado())
+ +                .numero(dto.getNumero())
+ +                .usuario_id(idUsuario)
+ +                .build();
+++=======
++     public Endereco updateEndereco(
++             EnderecoDTO dto,
++             Endereco entity
++     ) {
++         return Endereco.builder()
++                 .id(entity.getId())
++                 .rua(dto.getRua() != null
++                         ? dto.getRua()
++                         : entity.getRua())
++                 .bairro(entity.getBairro())
++                 .numero(dto.getNumero() != null
++                         ? dto.getNumero()
++                         : entity.getNumero())
++                 .complemento(dto.getComplemento() != null
++                         ? dto.getComplemento()
++                         : entity.getComplemento())
++                 .cidade(dto.getCidade() != null
++                         ? dto.getCidade()
++                         : entity.getCidade())
++                 .estado(dto.getEstado() != null
++                         ? dto.getEstado()
++                         : entity.getEstado())
++                 .cep(dto.getCep() != null
++                         ? dto.getCep()
++                         : entity.getCep())
++                 .build();
++     }
++ 
++     public Telefone updateTelefone(
++             TelefoneDTO dto,
++             Telefone entity
++     ) {
++         return Telefone.builder()
++                 .id(entity.getId())
++                 .numero(dto.getNumero() != null
++                         ? Long.valueOf(dto.getNumero())
++                         : entity.getNumero())
++                 .ddd(dto.getDdd() != null
++                         ? dto.getDdd()
++                         : entity.getDdd())
++                 .build();
++     }
+++>>>>>>> origin/develop
+  }
+ +
+ +public Telefone paraTelefoneEntity (TelefoneDTO dto, long idUsuario) {
+ +    return Telefone.builder()
+ +            .numero(dto.getNumero() == null
+ +                    ? null
+ +                    : Long.valueOf(dto.getNumero()))
+ +            .ddd(dto.getDdd())
+ +            .usuario_id(idUsuario)
+ +            .build();
+ +
+ +    }
+ +}
+diff --cc src/main/java/com/javanauta/usuario/busiess/UsuarioService.java
+index be9a554,6fb9f69..0000000
+--- a/src/main/java/com/javanauta/usuario/busiess/UsuarioService.java
++++ b/src/main/java/com/javanauta/usuario/busiess/UsuarioService.java
+@@@ -1,127 -1,123 +1,186 @@@
+  package com.javanauta.usuario.busiess;
+  
+  
+  import com.javanauta.usuario.busiess.Converter.UsuarioConverter;
+  import com.javanauta.usuario.busiess.dto.EnderecoDTO;
+  import com.javanauta.usuario.busiess.dto.TelefoneDTO;
+  import com.javanauta.usuario.busiess.dto.UsuarioDTO;
+  import com.javanauta.usuario.infrastructure.entity.Endereco;
+  import com.javanauta.usuario.infrastructure.entity.Telefone;
+  import com.javanauta.usuario.infrastructure.entity.Usuario;
+  import com.javanauta.usuario.infrastructure.exceptions.ConflictException;
+  import com.javanauta.usuario.infrastructure.exceptions.ResourceNotFoundException;
+  import com.javanauta.usuario.infrastructure.repository.EnderecoRepository;
+  import com.javanauta.usuario.infrastructure.repository.TelefoneRepository;
+  import com.javanauta.usuario.infrastructure.repository.UsuarioRepository;
+  import com.javanauta.usuario.infrastructure.security.JwtUtil;
+  import lombok.RequiredArgsConstructor;
+  import org.springframework.security.crypto.password.PasswordEncoder;
+  import org.springframework.stereotype.Service;
+ +import org.springframework.transaction.annotation.Transactional;
+ +
+ +import java.util.ArrayList;
+  
+  @Service
+  @RequiredArgsConstructor
+  
+  
+      public class UsuarioService {
+  
+      private final UsuarioRepository usuarioRepository;
+      private final UsuarioConverter usuarioConverter;
+      private final PasswordEncoder passwordEncoder;
+      private final JwtUtil jwtUtil;
+      private final EnderecoRepository enderecoRepository;
+      private final TelefoneRepository telefoneRepository;
+  
+      public UsuarioDTO salvarUsuario(UsuarioDTO usuarioDTO) {
+          emailExiste(usuarioDTO.getEmail());
+          usuarioDTO.setSenha(passwordEncoder.encode(usuarioDTO.getSenha()));
+          Usuario usuario = usuarioConverter.paraUsuario(usuarioDTO);
+          return usuarioConverter.paraUsuarioDTO(
+                  usuarioRepository.save(usuario)
+          );
+  
+      }
+  
+      public void emailExiste(String email) {
+          if (usuarioRepository.existsByEmail(email)) {
+              throw new ConflictException("E-mail já cadastrado: " + email);
+          }
+      }
+  
+      public boolean verificaEmailExistente(String email) {
+          return usuarioRepository.existsByEmail(email);
+  
+      }
+  
+      public UsuarioDTO buscaUsuarioPorEmail(String email) {
+          Usuario usuario = usuarioRepository.findByEmail(email)
+-                 .orElseThrow(() -> new ResourceNotFoundException(
+-                         "Email não encontrado: " + email
+-                 ));
++                 .orElseThrow(() ->
++                         new ResourceNotFoundException(
++                                 "Email não encontrado: " + email
++                         )
++                 );
+  
+          return usuarioConverter.paraUsuarioDTO(usuario);
+      }
+  
+      public void deletaUsuarioPorEmail(String email) {
+          usuarioRepository.deleteByEmail(email);
+      }
+  
+++<<<<<<< HEAD
+ +    public UsuarioDTO atualizaDadosUsuario(String token, UsuarioDTO dto) {
+ +        String email = jwtUtil.extrairEmailToken(token);
+ +
+ +        Usuario usuarioEntity = usuarioRepository.findByEmail(email)
+ +                .orElseThrow(() -> new ResourceNotFoundException(
+ +                        "Email não localizado: " + email));
+ +
+ +        dto.setSenha(dto.getSenha() != null
+ +                ? passwordEncoder.encode(dto.getSenha())
+ +                : null);
+ +
+ +        Usuario usuario = usuarioConverter.updateUsuario(dto, usuarioEntity);
+ +
+ +        return usuarioConverter.paraUsuarioDTO(usuarioRepository.save(usuario));
+ +    }
+ +
+ +    public EnderecoDTO atualizaEndereco(Long idEndereco, EnderecoDTO enderecoDTO) {
+ +        Endereco entity = enderecoRepository.findById(idEndereco).orElseThrow(() ->
+ +                new ResourceNotFoundException("Id não encontrado " + idEndereco));
+ +
+ +        Endereco endereco = usuarioConverter.updateEndereco(enderecoDTO, entity);
+ +
+ +        return usuarioConverter.paraEnderecoDTO(enderecoRepository.save(endereco));
+ +    }
+ +
+ +    public TelefoneDTO atualizaTelefone(Long idTelefone, TelefoneDTO dto) {
+ +        Telefone entity = telefoneRepository.findById(idTelefone).orElseThrow(() ->
+ +                new ResourceNotFoundException("Id não encontrado " + idTelefone));
+ +
+ +        Telefone telefone = usuarioConverter.updateTelefone(dto, entity);
+ +
+ +        return usuarioConverter.paraTelefoneDTO(telefoneRepository.save(telefone));
+ +    }
+ +
+ +    public EnderecoDTO cadastraEndereco(String token, EnderecoDTO dto) {
+ +        String email = jwtUtil.extrairEmailToken(token);
+ +        Usuario usuario = usuarioRepository.findByEmail(email)
+ +                .orElseThrow(() -> new ResourceNotFoundException("Email não localizado: " + email));
+ +
+ +        Endereco endereco = usuarioConverter.paraEnderecoEntity(dto, usuario.getId());
+ +        Endereco enderecoEntity = enderecoRepository.save(endereco);
+ +        return usuarioConverter.paraEnderecoDTO(enderecoEntity);
+ +
+ +    }
+ +
+ +    public TelefoneDTO cadastraTelefone(String token, TelefoneDTO dto) {
+ +        String email = jwtUtil.extrairEmailToken(token.substring(7));
+ +        Usuario usuario = usuarioRepository.findByEmail(email)
+ +                .orElseThrow(() -> new ResourceNotFoundException("Email não localizado: " + email));
+ +
+ +        Telefone telefone = usuarioConverter.paraTelefoneEntity(dto, usuario.getId());
+ +        return usuarioConverter.paraTelefoneDTO(
+ +                telefoneRepository.save(telefone)
+ +        );
+ +
+ +    }
+- }
+++}
+++=======
++     public UsuarioDTO atualizaDadosUsuario(
++             String token,
++             UsuarioDTO dto
++     ) {
++         String email = jwtUtil.extractUsername(token.substring(7));
++ 
++         Usuario usuarioEntity = usuarioRepository.findByEmail(email)
++                 .orElseThrow(() ->
++                         new ResourceNotFoundException(
++                                 "Email não localizado: " + email
++                         )
++                 );
++ 
++         if (dto.getSenha() != null && !dto.getSenha().isBlank()) {
++             dto.setSenha(passwordEncoder.encode(dto.getSenha()));
++         } else {
++             dto.setSenha(null);
++         }
++ 
++         Usuario usuario =
++                 usuarioConverter.updateUsuario(dto, usuarioEntity);
++ 
++         return usuarioConverter.paraUsuarioDTO(
++                 usuarioRepository.save(usuario)
++         );
++     }
++     public EnderecoDTO atualizaEndereco(EnderecoDTO enderecoDTO) {
++         Endereco entity = enderecoRepository.findById(enderecoDTO.getId())
++                 .orElseThrow(() ->
++                         new ResourceNotFoundException(
++                                 "Endereço não encontrado: " + enderecoDTO.getId()
++                         )
++                 );
++ 
++         Endereco endereco = usuarioConverter.updateEndereco(enderecoDTO, entity);
++         return usuarioConverter.paraEndereco(
++                 enderecoRepository.save(endereco)
++         );
++     }
++ 
++     public TelefoneDTO atualizaTelefone(TelefoneDTO telefoneDTO) {
++         Telefone entity = telefoneRepository.findById(telefoneDTO.getId())
++                 .orElseThrow(() ->
++                         new ResourceNotFoundException(
++                                 "Telefone não encontrado: " + telefoneDTO.getId()
++                         )
++                 );
++ 
++         Telefone telefone = usuarioConverter.updateTelefone(telefoneDTO, entity);
++         return usuarioConverter.paraTelefone(
++                 telefoneRepository.save(telefone)
++         );
++     }
++ }
+++>>>>>>> origin/develop
+diff --cc src/main/java/com/javanauta/usuario/controller/UsuarioController.java
+index 03ad544,5ac137a..0000000
+--- a/src/main/java/com/javanauta/usuario/controller/UsuarioController.java
++++ b/src/main/java/com/javanauta/usuario/controller/UsuarioController.java
+@@@ -1,93 -1,78 +1,116 @@@
+  package com.javanauta.usuario.controller;
+  
+  import com.javanauta.usuario.busiess.UsuarioService;
+  import com.javanauta.usuario.busiess.dto.EnderecoDTO;
+  import com.javanauta.usuario.busiess.dto.TelefoneDTO;
+  import com.javanauta.usuario.busiess.dto.UsuarioDTO;
+ +import com.javanauta.usuario.infrastructure.entity.Usuario;
+ +import com.javanauta.usuario.infrastructure.exceptions.ResourceNotFoundException;
+  import com.javanauta.usuario.infrastructure.security.JwtUtil;
+  import lombok.RequiredArgsConstructor;
+  import org.springframework.http.ResponseEntity;
+  import org.springframework.security.authentication.AuthenticationManager;
+  import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+  import org.springframework.security.core.Authentication;
+  import org.springframework.web.bind.annotation.*;
+  
+  @RestController
+  @RequestMapping("/usuario")
+  @RequiredArgsConstructor
+  public class UsuarioController {
+  
+      private final UsuarioService usuarioService;
+      private final AuthenticationManager authenticationManager;
+      private final JwtUtil jwtUtil;
+  
+      @PostMapping
+      public ResponseEntity<UsuarioDTO> salvaUsuario(
+              @RequestBody UsuarioDTO usuarioDTO
+      ) {
+          return ResponseEntity.ok(
+                  usuarioService.salvarUsuario(usuarioDTO)
+          );
+      }
+  
+  
+      @PostMapping("/login")
+      public String login(@RequestBody UsuarioDTO usuarioDTO) {
+          Authentication authentication = authenticationManager.authenticate(
+                  new UsernamePasswordAuthenticationToken(
+                          usuarioDTO.getEmail(),
+                          usuarioDTO.getSenha()
+                  )
+          );
+          return "Bearer " + jwtUtil.generateToken(authentication.getName());
+      }
++ 
+      @GetMapping
+      public ResponseEntity<UsuarioDTO> buscaUsuarioPorEmail(@RequestParam("email") String email) {
+          return ResponseEntity.ok(usuarioService.buscaUsuarioPorEmail(email));
+  
+      }
++ 
+      @DeleteMapping("/{email}")
+      public ResponseEntity<Void> deletaUsuarioPorEmail(@PathVariable String email) {
+          usuarioService.deletaUsuarioPorEmail(email);
+          return ResponseEntity.ok().build();
+  
+      }
+  
+      @PutMapping
+++<<<<<<< HEAD
+ +    public ResponseEntity<UsuarioDTO> atualizaDadosUsuario(
+ +            @RequestBody UsuarioDTO dto,
+ +            @RequestHeader("Authorization") String token) {
+ +        return ResponseEntity.ok(usuarioService.atualizaDadosUsuario(token, dto));
+ +    }
+ +
+ +    @PutMapping("/endereco")
+ +    public ResponseEntity<EnderecoDTO> atualizaEndereco(
+ +            @RequestParam("id") Long idEndereco,
+ +            @RequestBody EnderecoDTO dto) {
+ +        return ResponseEntity.ok(usuarioService.atualizaEndereco(idEndereco, dto));
+ +    }
+ +
+ +    @PutMapping("/telefone")
+ +    public ResponseEntity<TelefoneDTO> atualizaTelefone(
+ +            @RequestParam("id") Long id,
+ +            @RequestBody TelefoneDTO dto) {
+ +        return ResponseEntity.ok(usuarioService.atualizaTelefone(id, dto));
+ +    }
+ +    @PostMapping("/endereco")
+ +    public ResponseEntity<EnderecoDTO> cadastraEndereco(
+ +            @RequestBody EnderecoDTO dto,
+ +            @RequestHeader("Authorization")  String token) {
+ +        return ResponseEntity.ok(usuarioService.cadastraEndereco(token, dto));
+ +    }
+ +        @PostMapping("/telefone")
+ +        public ResponseEntity<TelefoneDTO> cadastraTelefone(
+ +                @RequestBody TelefoneDTO dto,
+ +                @RequestHeader("Authorization")  String token) {
+ +            return ResponseEntity.ok(usuarioService.cadastraTelefone(token, dto));
+ +
+ +
+ +
+++=======
++     public ResponseEntity<UsuarioDTO> atualizaDadosUsuario(@RequestBody UsuarioDTO dto,
++                                                            @RequestHeader("Authorization") String token) {
++         return ResponseEntity.ok(usuarioService.atualizaDadosUsuario(token, dto));
++ 
++     }
++ 
++     @PutMapping("/endereco")
++     public ResponseEntity<EnderecoDTO> atualizaEndereco(@RequestBody EnderecoDTO dto) {
++         return ResponseEntity.ok(
++                 usuarioService.atualizaEndereco(dto)
++         );
++     }
++ 
++     @PutMapping("/telefone")
++     public ResponseEntity<TelefoneDTO> atualizaTelefone(@RequestBody TelefoneDTO dto) {
++         return ResponseEntity.ok(
++                 usuarioService.atualizaTelefone(dto)
++         );
+++>>>>>>> origin/develop
+      }
+  }
